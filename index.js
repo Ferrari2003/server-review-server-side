@@ -15,33 +15,41 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.wjha8kd.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-async function run(){
-    try{
+async function run() {
+    try {
         const barberCollection = client.db('barber').collection('shop');
+        const reviewCollection = client.db('barber').collection('review');
 
-        app.get('/', async(req, res) => {
+        app.get('/', async (req, res) => {
             const query = {}
             const limit = 3
             const cursor = barberCollection.find(query).limit(limit)
             const service = await cursor.toArray()
             res.send(service)
         });
-        app.get('/services', async(req, res) => {
-            const query ={}
+        app.get('/services', async (req, res) => {
+            const query = {}
             const cursor = barberCollection.find(query)
             const services = await cursor.toArray()
             res.send(services)
         });
 
-       app.get('/services/:id', async(req, res) => {
-        const id = req.params.id
-        const query = {_id: ObjectId(id)}
-        const user =await barberCollection.findOne(query)
-        res.send(user)
-       })
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const user = await barberCollection.findOne(query)
+            res.send(user)
+        })
+
+        // review API
+        app.post('/review', async(req, res)=> {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
 
     }
-    finally{
+    finally {
 
     }
 }
