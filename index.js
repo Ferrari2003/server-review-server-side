@@ -20,6 +20,12 @@ async function run() {
         const barberCollection = client.db('barber').collection('shop');
         const reviewCollection = client.db('barber').collection('review');
 
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+            res.send(token)
+        })
+
         app.get('/', async (req, res) => {
             const query = {}
             const limit = 3
@@ -78,7 +84,6 @@ async function run() {
             const result = await reviewCollection.deleteOne(query);
             res.send(result);
         })
-
     }
     finally {
 
